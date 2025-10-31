@@ -293,10 +293,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn-login">Login</button>
         </form>
 
-      <!--   <div class="info-box">
-            <h3>Default Login Credentials</h3>
-            <p><strong>Username:</strong> admin<br><strong>Password:</strong> admin123</p>
-        </div>-->
     </div>
 </body>
 </html>
