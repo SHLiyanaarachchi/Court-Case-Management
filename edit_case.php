@@ -7,19 +7,19 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Check if case_id is provided
-if (!isset($_GET['case_id']) || empty($_GET['case_id'])) {
+// Check if case_no is provided
+if (!isset($_GET['case_id']) || empty($_GET['case_no'])) {
     header('Location: dashboard.php');
     exit();
 }
 
-$case_id = $_GET['case_id'];
+$case_no = $_GET['case_no'];
 $success = '';
 $error = '';
 
 // Fetch case details
-$stmt = $conn->prepare("SELECT * FROM cases WHERE case_id = ?");
-$stmt->bind_param("s", $case_id);
+$stmt = $conn->prepare("SELECT * FROM cases WHERE case_no = ?");
+$stmt->bind_param("s", $case_no);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -33,42 +33,47 @@ $stmt->close();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $case_title = trim($_POST['case_title'] ?? '');
-    $case_type = trim($_POST['case_type'] ?? '');
-    $plaintiff_name = trim($_POST['plaintiff_name'] ?? '');
-    $defendant_name = trim($_POST['defendant_name'] ?? '');
-    $filing_date = $_POST['filing_date'] ?? '';
-    $court_name = trim($_POST['court_name'] ?? '');
-    $judge_name = trim($_POST['judge_name'] ?? '');
-    $case_status = trim($_POST['case_status'] ?? '');
-    $case_description = trim($_POST['case_description'] ?? '');
-    $next_hearing_date = $_POST['next_hearing_date'] ?? null;
+    $Types = trim($_POST['Types'] ?? '');
+    $Case_No= trim($_POST['Case_No'] ?? '');
+    $Province = trim($_POST['Province'] ?? '');
+    $District = trim($_POST['District'] ?? '');
+    $Filed_Date = trim($_POST['Filed_Date'] ?? '');
+    $Court = trim($_POST['Court'] ?? '');
+    $Category_Cause_of_Action = trim($_POST['Category_Cause_of_Action'] ?? '');
+    $Name_Address = trim($_POST['Name_Address'] ?? '');
+    $Terminated = trim($_POST['Terminated'] ?? '');
+    $Next_Date = trim($_POST['Next_Date'] ?? '');
+    $Remarks = $trim($_POST['Remarks'] ?? '');
+    $Last_Date = $trim($_post['Last_Date'] ?? '');
+
 
     // Validation
-    if (empty($case_title) || empty($case_type) || empty($plaintiff_name) ||
-        empty($defendant_name) || empty($filing_date) || empty($court_name) || empty($case_status)) {
+    if (empty($Types) || empty($Case_No) || empty($Province) ||
+        empty($District) || empty($Filed_Date) || empty($Court) || empty($Category_Cause_of_Action)|| empty($Name_Address)|| empty($Terminated)|| empty($Next_Date)|| empty($Remarks)|| empty($Last_Date)) {
         $error = 'Please fill in all required fields';
     } else {
         // Update case
-        $update_stmt = $conn->prepare("UPDATE cases SET case_title = ?, case_type = ?, plaintiff_name = ?, defendant_name = ?, filing_date = ?, court_name = ?, judge_name = ?, case_status = ?, case_description = ?, next_hearing_date = ? WHERE case_id = ?");
+        $update_stmt = $conn->prepare("UPDATE cases SET Types = ?, Case_No = ?, Province = ?, District = ?, Filed_Date = ?, Court = ?, Category_Cause_of_Action = ?, Name_Address = ?, Terminated= ?, Next_Date = ?,Remarks = ?,Last_Date = ?, WHERE case_no= ?");
 
-        $next_hearing_date_value = !empty($next_hearing_date) ? $next_hearing_date : null;
+        $Next_Date_value = !empty($Next_Date) ? $Next_Date : null;
 
-        $update_stmt->bind_param("sssssssssss", $case_title, $case_type, $plaintiff_name, $defendant_name, $filing_date, $court_name, $judge_name, $case_status, $case_description, $next_hearing_date_value, $case_id);
+        $update_stmt->bind_param("sssssssssss", $Types, $Case_No, $Province, $District, $Filed_Date, $Court, $Category_Cause_of_Action, $Name_Address, $Terminated, $next_hearing_date_value, $Remarks,$Last_Date);
 
         if ($update_stmt->execute()) {
             $success = 'Case updated successfully!';
             // Refresh case data
-            $case['case_title'] = $case_title;
-            $case['case_type'] = $case_type;
-            $case['plaintiff_name'] = $plaintiff_name;
-            $case['defendant_name'] = $defendant_name;
-            $case['filing_date'] = $filing_date;
-            $case['court_name'] = $court_name;
-            $case['judge_name'] = $judge_name;
-            $case['case_status'] = $case_status;
-            $case['case_description'] = $case_description;
-            $case['next_hearing_date'] = $next_hearing_date_value;
+            $case['Types'] = $Types;
+            $case['Case_No'] = $Case_No;
+            $case['Province'] = $Province;
+            $case['Districte'] = $District;
+            $case['Filed_Date'] = $Filed_Date;
+            $case['Court'] = $Court;
+            $case['Category_Cause_of_Action'] = $Category_Cause_of_Action;
+            $case['Name_Address'] = $Name_Address;
+            $case['Terminated'] = $Terminated;
+            $case['Next_Date'] = $Next_Date_value;
+            $case['Remarks'] = $Remarks;
+            $case['Last_Date'] = $Last_Date;
         } else {
             $error = 'Error updating case: ' . $conn->error;
         }
@@ -358,7 +363,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ⚖️ Court Case Management
         </div>
         <div class="navbar-user">
-            <a href="dashboard.php?case_id=<?php echo urlencode($case_id); ?>" class="btn-back">← Back to Case</a>
+            <a href="dashboard.php?case_no=<?php echo urlencode($case_no); ?>" class="btn-back">← Back to Case</a>
         </div>
     </nav>
 
@@ -367,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-header">
                 <h2>✏️ Edit Case</h2>
                 <p>Update case information</p>
-                <span class="case-id-badge">Case ID: <?php echo htmlspecialchars($case['case_id']); ?></span>
+                <span class="case-id-badge">Case ID: <?php echo htmlspecialchars($case['case_no)']); ?></span>
             </div>
 
             <?php if ($success): ?>
@@ -381,86 +386,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="">
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="case_title">Case Title <span class="required">*</span></label>
-                        <input type="text" id="case_title" name="case_title" required
-                               value="<?php echo htmlspecialchars($case['case_title']); ?>"
+                        <label for="Types">Types <span class="required">*</span></label>
+                        <select id="Types" name="Types" required>
+                            <option value="">Select Type</option>
+                            <option value="Filed by the CEA" <?php echo ($case['Types'] === 'Filed by the CEA') ? 'selected' : ''; ?>>Filed by the CEA</option>
+                            <option value="Filed against the CEA - Pending" <?php echo ($case['Types'] === 'Filed against the CEA - Pending') ? 'selected' : ''; ?>>Filed against the CEA - Pending</option>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Case_No">Case No <span class="required">*</span></label>
+                        <input type="text" id="Case_No" name="Case_No" required
+                               value="<?php echo htmlspecialchars($case['Case_No']); ?>"
                                placeholder="Enter case title">
                     </div>
 
                     <div class="form-group">
-                        <label for="case_type">Case Type <span class="required">*</span></label>
-                        <select id="case_type" name="case_type" required>
-                            <option value="">Select Case Type</option>
-                            <option value="Civil" <?php echo ($case['case_type'] === 'Civil') ? 'selected' : ''; ?>>Civil</option>
-                            <option value="Criminal" <?php echo ($case['case_type'] === 'Criminal') ? 'selected' : ''; ?>>Criminal</option>
-                            <option value="Family" <?php echo ($case['case_type'] === 'Family') ? 'selected' : ''; ?>>Family</option>
-                            <option value="Commercial" <?php echo ($case['case_type'] === 'Commercial') ? 'selected' : ''; ?>>Commercial</option>
-                            <option value="Constitutional" <?php echo ($case['case_type'] === 'Constitutional') ? 'selected' : ''; ?>>Constitutional</option>
-                        </select>
+                        <label for="Name_Address">Name Address <span class="required">*</span></label>
+                        <input type="text" id="Name_Address" name="Name_Address" required
+                               value="<?php echo htmlspecialchars($case['Name_Address']); ?>"
+                               placeholder="Enter case title">
                     </div>
 
                     <div class="form-group">
-                        <label for="case_status">Case Status <span class="required">*</span></label>
-                        <select id="case_status" name="case_status" required>
-                            <option value="">Select Status</option>
-                            <option value="Active" <?php echo ($case['case_status'] === 'Active') ? 'selected' : ''; ?>>Active</option>
-                            <option value="Under Trial" <?php echo ($case['case_status'] === 'Under Trial') ? 'selected' : ''; ?>>Under Trial</option>
-                            <option value="Settled" <?php echo ($case['case_status'] === 'Settled') ? 'selected' : ''; ?>>Settled</option>
-                            <option value="Closed" <?php echo ($case['case_status'] === 'Closed') ? 'selected' : ''; ?>>Closed</option>
-                            <option value="Pending" <?php echo ($case['case_status'] === 'Pending') ? 'selected' : ''; ?>>Pending</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="plaintiff_name">Plaintiff Name <span class="required">*</span></label>
-                        <input type="text" id="plaintiff_name" name="plaintiff_name" required
-                               value="<?php echo htmlspecialchars($case['plaintiff_name']); ?>"
+                        <label for="Province">Province <span class="required">*</span></label>
+                        <input type="text" id="Province" name="Province" required
+                               value="<?php echo htmlspecialchars($case['Province']); ?>"
                                placeholder="Enter plaintiff name">
                     </div>
 
                     <div class="form-group">
-                        <label for="defendant_name">Defendant Name <span class="required">*</span></label>
-                        <input type="text" id="defendant_name" name="defendant_name" required
-                               value="<?php echo htmlspecialchars($case['defendant_name']); ?>"
+                        <label for="dDistrict">District <span class="required">*</span></label>
+                        <input type="text" id="District" name="District" required
+                               value="<?php echo htmlspecialchars($case['District']); ?>"
                                placeholder="Enter defendant name">
                     </div>
 
                     <div class="form-group">
-                        <label for="filing_date">Filing Date <span class="required">*</span></label>
-                        <input type="date" id="filing_date" name="filing_date" required
-                               value="<?php echo htmlspecialchars($case['filing_date']); ?>">
+                        <label for="Filed_Date">Filed Date <span class="required">*</span></label>
+                        <input type="date" id="Filed_Date" name="Filed_Date" required
+                               value="<?php echo htmlspecialchars($case['Filed_Date']); ?>">
                     </div>
 
                     <div class="form-group">
-                        <label for="court_name">Court Name <span class="required">*</span></label>
-                        <input type="text" id="court_name" name="court_name" required
-                               value="<?php echo htmlspecialchars($case['court_name']); ?>"
+                        <label for="Court">Court <span class="required">*</span></label>
+                        <input type="text" id="Court" name="cCourt" required
+                               value="<?php echo htmlspecialchars($case['Court']); ?>"
                                placeholder="e.g., District Court A">
                     </div>
 
                     <div class="form-group">
-                        <label for="judge_name">Judge Name</label>
-                        <input type="text" id="judge_name" name="judge_name"
-                               value="<?php echo htmlspecialchars($case['judge_name']); ?>"
+                        <label for="Category_Cause_of_Action">Category/Cause of Action</label>
+                        <input type="text" id="Category_Cause_of_Action" name="Category_Cause_of_Action"
+                               value="<?php echo htmlspecialchars($case['Category_Cause_of_Action']); ?>"
                                placeholder="e.g., Hon. Judge Smith">
                     </div>
 
                     <div class="form-group">
-                        <label for="next_hearing_date">Next Hearing Date</label>
-                        <input type="date" id="next_hearing_date" name="next_hearing_date"
-                               value="<?php echo htmlspecialchars($case['next_hearing_date'] ?? ''); ?>">
+                        <label for="Next_Date">Next Date</label>
+                        <input type="date" id="Next_Date" name="Next_Date"
+                               value="<?php echo htmlspecialchars($case['Next_Date'] ?? ''); ?>">
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="case_description">Case Description</label>
-                        <textarea id="case_description" name="case_description"
-                                  placeholder="Enter detailed case description"><?php echo htmlspecialchars($case['case_description']); ?></textarea>
+                        <label for="Terminated">Terminated</label>
+                        <textarea id="Terminated" name="Terminated"
+                                  placeholder="Enter detailed Terminated"><?php echo htmlspecialchars($case['Terminated']); ?></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="Remarks">Remarks</label>
+                        <textarea id="Remarks" name="Remarks"
+                                  placeholder="Enter detailed Remarks"><?php echo htmlspecialchars($case['Remarks']); ?></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="Last_Date">Last Date</label>
+                        <textarea id="Last_Date" name="Last_Date"
+                                  placeholder="Enter detailed Last_Date"><?php echo htmlspecialchars($case['Last_Date']); ?></textarea>
                     </div>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-submit">💾 Update Case</button>
-                    <a href="dashboard.php?case_id=<?php echo urlencode($case_id); ?>" class="btn btn-cancel">✕ Cancel</a>
+                    <a href="dashboard.php?case_no=<?php echo urlencode($case_id); ?>" class="btn btn-cancel">✕ Cancel</a>
                 </div>
             </form>
         </div>

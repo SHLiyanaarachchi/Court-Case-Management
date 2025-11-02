@@ -1,10 +1,8 @@
 -- Court Case Management System Database
--- Import this file into phpMyAdmin or MySQL
-
 CREATE DATABASE IF NOT EXISTS court_case_management;
 USE court_case_management;
 
--- Users table for login
+-- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -15,30 +13,29 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Cases table
 CREATE TABLE IF NOT EXISTS cases (
-    case_id VARCHAR(50) PRIMARY KEY,
-    case_title VARCHAR(255) NOT NULL,
-    case_type VARCHAR(100) NOT NULL,
-    plaintiff_name VARCHAR(150) NOT NULL,
-    defendant_name VARCHAR(150) NOT NULL,
-    filing_date DATE NOT NULL,
-    court_name VARCHAR(150) NOT NULL,
-    judge_name VARCHAR(100),
-    case_status VARCHAR(50) NOT NULL,
-    case_description TEXT,
-    next_hearing_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  Types VARCHAR(50),
+  case_no VARCHAR(50),
+  province VARCHAR(100) DEFAULT NULL,
+  district VARCHAR(100) DEFAULT NULL,
+  filed_date DATE DEFAULT NULL,
+  court VARCHAR(150) DEFAULT NULL,
+  category_cause VARCHAR(150) DEFAULT NULL,
+  name_and_address TEXT DEFAULT NULL,
+  terminated TINYINT(1) DEFAULT 0,
+  next_date DATE DEFAULT NULL,
+  remarks TEXT DEFAULT NULL,
+  last_date DATE DEFAULT NULL
 );
 
--- Insert default admin user (username: admin, password: admin123)
+-- Default users
 INSERT INTO users (username, password, full_name) VALUES
-('admin', '12', 'System Administrator');
-('user', '12345', 'CEA');
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator'),
+('user', '12345', 'John Doe');
 
--- Insert sample cases
-INSERT INTO cases (case_id, case_title, case_type, plaintiff_name, defendant_name, filing_date, court_name, judge_name, case_status, case_description, next_hearing_date) VALUES
-('CIV-2024-001', 'Smith vs. Johnson Property Dispute', 'Civil', 'John Smith', 'Robert Johnson', '2024-01-15', 'District Court A', 'Hon. Judge Williams', 'Active', 'Property boundary dispute regarding land ownership.', '2024-11-15'),
-('CRM-2024-002', 'State vs. Anderson', 'Criminal', 'State Prosecutor', 'Michael Anderson', '2024-02-20', 'Criminal Court B', 'Hon. Judge Davis', 'Under Trial', 'Criminal case involving theft charges.', '2024-11-20'),
-('FAM-2024-003', 'Brown Divorce Case', 'Family', 'Sarah Brown', 'David Brown', '2024-03-10', 'Family Court C', 'Hon. Judge Martinez', 'Active', 'Divorce proceedings with custody disputes.', '2024-11-25'),
-('CIV-2024-004', 'Tech Corp vs. StartUp Inc', 'Civil', 'Tech Corporation', 'StartUp Inc', '2024-04-05', 'Commercial Court D', 'Hon. Judge Thompson', 'Settled', 'Contract breach and damages claim.', NULL),
-('CRM-2024-005', 'State vs. Wilson', 'Criminal', 'State Prosecutor', 'James Wilson', '2024-05-12', 'Criminal Court B', 'Hon. Judge Garcia', 'Active', 'Fraud investigation case.', '2024-12-01');
+-- Sample case data
+INSERT INTO cases (Types, province, district, case_no, filed_date, court, category_cause, name_and_address, terminated, next_date, remarks, last_date)
+VALUES
+('Filed by the CEA','Central','Kandy','123/2023','2023-01-15','Kandy Magistrate Court','Environmental Violation','John Doe, 123 Main St, Kandy',0,'2023-02-20','Initial hearing completed.','2023-01-15'),
+('Filed by the CEA','Western','Colombo','456/2023','2023-02-10','Colombo District Court','Pollution Case','Jane Smith, 456 Elm St, Colombo',0,'2023-03-15','Awaiting evidence submission.','2023-02-10'),
+('Filed by the CEA','Southern','Galle','789/2023','2023-03-05','Galle Magistrate Court','Illegal Dumping','Mike Johnson, 789 Pine St, Galle',0,'2023-04-10','Case under investigation.','2023-03-05');
