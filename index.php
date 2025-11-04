@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+           background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%); 
             position: relative;
             overflow: hidden;
         }
@@ -270,9 +270,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-container">
         <div class="logo">
             <h1>Central Environmental Authority</h1>
-            <h1>⚖️</h1>
+            <h1> ⚖️ </h1>
             <h1> Court Case Management</h1>
-            <p> Login Page</p>
+            <p>Login Page</p>
         </div>
 
         <?php if ($error): ?>
@@ -293,9 +293,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn-login">Login</button>
         </form>
 
-      <!--   <div class="info-box">
+       <!-- <div class="info-box">
             <h3>Default Login Credentials</h3>
-            <p><strong>Username:</strong> admin<br><strong>Password:</strong> admin123</p>
+           <p><strong>Username:</strong> admin<br><strong>Password:</strong> admin123</p>
         </div>-->
     </div>
 </body>

@@ -24,19 +24,19 @@ $under_trial_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date = 'Und
 $under_trial_result = $conn->query($under_trial_query);
 $under_trial_cases = $under_trial_result->fetch_assoc()['total'];
 
-$upcoming_hearings_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date >= CURDATE()";
+$upcoming_hearings_query = "SELECT COUNT(*) as total FROM cases WHERE Last_Date >= CURDATE()";
 $upcoming_hearings_result = $conn->query($upcoming_hearings_query);
 $upcoming_hearings = $upcoming_hearings_result->fetch_assoc()['total'];
 
-$case_types_query = "SELECT Types, COUNT(*) as count FROM cases GROUP BY Types ORDER BY count DESC";
+$case_types_query = "SELECT Province, COUNT(*) as count FROM cases GROUP BY Province ORDER BY count DESC";
 $case_types_result = $conn->query($case_types_query);
-$Types = [];
+$case_types = [];
 while ($row = $case_types_result->fetch_assoc()) {
     $case_types[] = $row;
 }
 
 // Fetch all case IDs for dropdown
-$cases_query = "SELECT Case_No, Types FROM cases ORDER BY Case_No";
+$cases_query = "SELECT Case_No., case_title FROM cases ORDER BY Case_No.";
 $cases_result = $conn->query($cases_query);
 $all_cases = [];
 while ($row = $cases_result->fetch_assoc()) {
@@ -45,10 +45,10 @@ while ($row = $cases_result->fetch_assoc()) {
 
 // Get selected case details
 $selected_case = null;
-if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
-    $Case_No = $_GET['Case_No'];
-    $stmt = $conn->prepare("SELECT * FROM cases WHERE Case_No = ?");
-    $stmt->bind_param("s", $Case_No);
+if (isset($_GET['Case_No.']) && !empty($_GET['Case_No.'])) {
+    $Case_No. = $_GET['Case_No.'];
+    $stmt = $conn->prepare("SELECT * FROM cases WHERE Case_No.= ?");
+    $stmt->bind_param("s", $Case_No.);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows === 1) {
@@ -605,16 +605,16 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                 </div>
             </div>
 
-            <?php if (!empty($Types)): ?>
+            <?php if (!empty($case_types)): ?>
             <div class="case-types-section">
                 <div class="case-types-header">
                     <span style="font-size: 24px;">📈</span>
                     <h3>Cases by Type</h3>
                 </div>
                 <div class="case-types-list">
-                    <?php foreach ($Types as $type): ?>
+                    <?php foreach ($case_types as $type): ?>
                     <div class="case-type-item">
-                        <span class="case-type-name"><?php echo htmlspecialchars($type['Types']); ?></span>
+                        <span class="case-type-name"><?php echo htmlspecialchars($type['case_type']); ?></span>
                         <span class="case-type-count"><?php echo $type['count']; ?></span>
                     </div>
                     <?php endforeach; ?>
@@ -633,14 +633,14 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
 
             <form method="GET" action="" class="search-form">
                 <div class="form-group">
-                    <label for="Case_No">Select or Type Case ID</label>
+                    <label for="Case_No.">Select or Type Case ID</label>
                     <div class="select-wrapper">
-                        <select name="Case_No" id="Case_No" required>
+                        <select name="Case_No." id="Case_No." required>
                             <option value="">-- Select a Case ID --</option>
                             <?php foreach ($all_cases as $case): ?>
-                                <option value="<?php echo htmlspecialchars($case['Case_No']); ?>"
-                                    <?php echo (isset($_GET['Case_No']) && $_GET['Case_No'] === $case['Case_No']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($case['Case_No']) . ' - ' . htmlspecialchars($case['Types']); ?>
+                                <option value="<?php echo htmlspecialchars($case['Case_No.']); ?>"
+                                    <?php echo (isset($_GET['Case_No.']) && $_GET['Case_No.'] === $case['Case_No.']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($case['Case_No.']) . ' - ' . htmlspecialchars($case['case_title']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -655,8 +655,8 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                 <div class="case-details-header">
                     <h3>📋 Case Details</h3>
                     <div class="case-actions">
-                        <a href="edit_case.php?Case_No=<?php echo urlencode($selected_case['Case_No']); ?>" class="btn btn-edit">✏️ Edit</a>
-                        <a href="delete_case.php?Case_No=<?php echo urlencode($selected_case['Case_No']); ?>"
+                        <a href="edit_case.php?Case_No.=<?php echo urlencode($selected_case['Case_No.']); ?>" class="btn btn-edit">✏️ Edit</a>
+                        <a href="delete_case.php?Case_No.=<?php echo urlencode($selected_case['Case_No.']); ?>"
                            class="btn btn-delete"
                            onclick="return confirm('Are you sure you want to delete this case? This action cannot be undone.');">
                            🗑️ Delete
@@ -666,25 +666,25 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
 
                 <div class="details-grid">
                     <div class="detail-item">
-                        <div class="detail-label">Case No </div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Case_No']); ?></div>
+                        <div class="detail-label">Case ID</div>
+                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Case_No.']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Case Title</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Types']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['case_title']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Case Type</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Types']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['case_type']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Status</div>
                         <div class="detail-value">
                             <?php
-                            $status = $selected_case['case_status'];
+                            $status = $selected_case['Next_Date'];
                             $status_class = 'status-active';
                             if (strpos(strtolower($status), 'settled') !== false) {
                                 $status_class = 'status-settled';
@@ -726,7 +726,7 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                     <div class="detail-item">
                         <div class="detail-label">Next Hearing Date</div>
                         <div class="detail-value">
-                            <?php echo $selected_case['next_hearing_date'] ? date('F d, Y', strtotime($selected_case['next_hearing_date'])) : 'Not Scheduled'; ?>
+                            <?php echo $selected_case['Last_Date'] ? date('F d, Y', strtotime($selected_case['Last_Date'])) : 'Not Scheduled'; ?>
                         </div>
                     </div>
 
@@ -736,7 +736,7 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                     </div>
                 </div>
             </div>
-        <?php elseif (isset($_GET['Case_No'])): ?>
+        <?php elseif (isset($_GET['Case_No.'])): ?>
             <div class="case-details">
                 <div class="no-case">
                     <div class="no-case-icon">❌</div>
