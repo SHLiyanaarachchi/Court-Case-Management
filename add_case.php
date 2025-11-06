@@ -12,27 +12,30 @@ $error = '';
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $Case_No. = trim($_POST['Case_No.'] ?? '');
-    $Type = trim($_POST['Type '] ?? '');
+    $Types = trim($_POST['Types'] ?? '');
+    $Case_No= trim($_POST['Case_No'] ?? '');
     $Province = trim($_POST['Province'] ?? '');
     $District = trim($_POST['District'] ?? '');
-    $plaintiff_name = trim($_POST['plaintiff_name'] ?? '');
-    $defendant_name = trim($_POST['defendant_name'] ?? '');
-    $filing_date = $_POST['filing_date'] ?? '';
-    $court_name = trim($_POST['court_name'] ?? '');
-    $judge_name = trim($_POST['judge_name'] ?? '');
-    $case_status = trim($_POST['case_status'] ?? '');
-    $case_description = trim($_POST['case_description'] ?? '');
-    $next_hearing_date = $_POST['next_hearing_date'] ?? null;
+    $Filed_Date = trim($_POST['Filed_Date'] ?? '');
+    $Court = trim($_POST['Court'] ?? '');
+    $Category_Cause_of_Action = trim($_POST['Category_Cause_of_Action'] ?? '');
+    $Plaintiff_Name_Address = trim($_POST['Plaintiff_Name_Address'] ?? '');
+    $Defendant_Name_Address = trim($_POST['Defendant_Name_Address'] ?? '');
+    $Terminated = trim($_POST['Terminated'] ?? '');
+    $Next_Date = trim($_POST['Next_Date'] ?? '');
+    $Remarks = trim($_POST['Remarks'] ?? '');
+    $Last_Date = trim($_POST['Last_Date'] ?? '');
+
 
     // Validation
-    if (empty($Case_No.) || empty($Province) || empty($District) || empty($plaintiff_name) ||
-        empty($defendant_name) || empty($filing_date) || empty($court_name) || empty($case_status)) {
+    if (empty($Case_No) || empty($Types) || empty($Province) || empty($District) ||
+        empty($Filed_Date) || empty($Court) || empty($Category_Cause_of_Action) || 
+        empty($Defendant_Name_Address) ||empty($Plaintiff_Name_Address) || empty($Terminated) || empty($Case_status) || empty($Next_Date) || empty($Remarks)|| empty($Last_Date)) {
         $error = 'Please fill in all required fields';
     } else {
         // Check if case ID already exists
-        $check_stmt = $conn->prepare("SELECT Case_No. FROM cases WHERE Case_No. = ?");
-        $check_stmt->bind_param("s", $Case_No.);
+        $check_stmt = $conn->prepare("SELECT Case_No FROM cases WHERE Case_No = ?");
+        $check_stmt->bind_param("s", $Case_No);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
 
@@ -40,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Case ID already exists. Please use a different Case ID.';
         } else {
             // Insert new case
-            $stmt = $conn->prepare("INSERT INTO cases (Case_No., Province, District, plaintiff_name, defendant_name, filing_date, court_name, judge_name, case_status, case_description, next_hearing_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO cases (Case_No, Types, Province, District, Filed_Date, Court, Category_Cause_of_Action, Defendant_Name_Address,Plaintiff_Name_Address, Terminated, Next_Date, Remarks,Last_Date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-            $next_hearing_date_value = !empty($next_hearing_date) ? $next_hearing_date : null;
+            $Next_Date_value = !empty($Next_Date) ? $Next_Date : null;
 
-            $stmt->bind_param("sssssssssss", $Case_No., $Province, $District, $plaintiff_name, $defendant_name, $filing_date, $court_name, $judge_name, $case_status, $case_description, $next_hearing_date_value);
+            $stmt->bind_param("sssssssssss", $Case_No, $Types, $Province, $District, $Filed_Date, $Court, $Category_Cause_of_Action, $Defendant_Name_Address,$Plaintiff_Name_Address, $Terminated, $Remarks, $next_hearing_date_value, $Last_Date);
 
             if ($stmt->execute()) {
                 $success = 'Case added successfully!';
@@ -353,68 +356,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="Case_No.">Case No. <span class="required">*</span></label>
-                        <input type="text" id="Case_No." name="Case_No." required
-                               value="<?php echo htmlspecialchars($_POST['Case_No.'] ?? ''); ?>"
+                        <label for="Case_No">Case No <span class="required">*</span></label>
+                        <input type="text" id="Case_No" name="Case_No" required
+                               value="<?php echo htmlspecialchars($_POST['Case_No'] ?? ''); ?>"
                                placeholder="e.g., CIV-2024-001">
                     </div>
 
                     <div class="form-group">
-                        <label for="case_type">Province <span class="required">*</span></label>
-                        <select id="case_type" name="case_type" required>
-                            <option value="">Select Province </option>
-                            <option value="Central Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Central Province') ? 'selected' : ''; ?>>Central Province</option>
-                            <option value="North Central Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'North Central Province') ? 'selected' : ''; ?>>North Central Province</option>
-                            <option value="Eastern Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Eastern Province') ? 'selected' : ''; ?>>Eastern Province</option>
-                            <option value="North Western Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'North Western Province') ? 'selected' : ''; ?>>North Western Province</option>
-                            <option value="Sabaragamuwa Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Sabaragamuwa Province') ? 'selected' : ''; ?>>Sabaragamuwa Province</option>
-                            <option value="Southern Province" <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Southern Province') ? 'selected' : ''; ?>>Southern Province</option>
-                            <option value="Uva Province " <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Uva Province ') ? 'selected' : ''; ?>>Uva Province </option>
-                            <option value="Western Province " <?php echo (isset($_POST['case_type']) && $_POST['case_type'] === 'Western Province ') ? 'selected' : ''; ?>>Western Province </option>
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width">
                         <label for="Province">Province <span class="required">*</span></label>
                         <input type="text" id="Province" name="Province" required
                                value="<?php echo htmlspecialchars($_POST['Province'] ?? ''); ?>"
-                               placeholder="Enter case title">
+                               placeholder="Enter case Province">
+                        
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="Types">Types  <span class="required">*</span></label>
+                        <select id="Types" name="Types" required>
+                            <option value="">Select Type</option>
+                            <option value="Filed by the CEA" <?php echo ($case['Types'] === 'Filed by the CEA') ? 'selected' : ''; ?>>Filed by the CEA</option>
+                            <option value="Filed against the CEA - Pending" <?php echo ($case['Types'] === 'Filed against the CEA - Pending') ? 'selected' : ''; ?>>Filed against the CEA - Pending</option>
+                       </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="plaintiff_name">Plaintiff Name <span class="required">*</span></label>
-                        <input type="text" id="plaintiff_name" name="plaintiff_name" required
-                               value="<?php echo htmlspecialchars($_POST['plaintiff_name'] ?? ''); ?>"
-                               placeholder="Enter plaintiff name">
+                        <label for="District">District <span class="required">*</span></label>
+                        <input type="text" id="pDistrict" name="District" required
+                               value="<?php echo htmlspecialchars($_POST['District'] ?? ''); ?>"
+                               placeholder="Enter District">
                     </div>
 
                     <div class="form-group">
-                        <label for="defendant_name">Defendant Name <span class="required">*</span></label>
-                        <input type="text" id="defendant_name" name="defendant_name" required
-                               value="<?php echo htmlspecialchars($_POST['defendant_name'] ?? ''); ?>"
-                               placeholder="Enter defendant name">
+                        <label for="Filed_Date">Filed Date <span class="required">*</span></label>
+                        <input type="date" id="Filed_Date" name="Filed_Date" required
+                               value="<?php echo htmlspecialchars($_POST['Filed_Date'] ?? ''); ?>"
+                               placeholder="Enter Filed Date">
                     </div>
 
                     <div class="form-group">
-                        <label for="filing_date">Filing Date <span class="required">*</span></label>
-                        <input type="date" id="filing_date" name="filing_date" required
-                               value="<?php echo htmlspecialchars($_POST['filing_date'] ?? ''); ?>">
+                        <label for="Court">Court <span class="required">*</span></label>
+                        <input type="date" id="Court" name="Court" required
+                               value="<?php echo htmlspecialchars($_POST['Court'] ?? ''); ?>"
+                               placeholder="Enter Courte">
                     </div>
 
                     <div class="form-group">
-                        <label for="court_name">Court Name <span class="required">*</span></label>
-                        <input type="text" id="court_name" name="court_name" required
-                               value="<?php echo htmlspecialchars($_POST['court_name'] ?? ''); ?>"
-                               placeholder="e.g., District Court A">
+                        <label for="Category_Cause_of_Action">Category/Cause of Action <span class="required">*</span></label>
+                        <input type="text" id="Category_Cause_of_Action" name="Category_Cause_of_Action" required
+                               value="<?php echo htmlspecialchars($_POST['Category_Cause_of_Action'] ?? ''); ?>"
+                               placeholder="e.g., Category/Cause of Action">
                     </div>
 
                     <div class="form-group">
+                        <label for="Plaintiff_Name_Address">Plaintiff Name Address</label>
+                        <input type="text" id="Plaintiff_Name_Address" name="Plaintiff_Name_Address
+                               value="<?php echo htmlspecialchars($_POST['Plaintiff_Name_Address'] ?? ''); ?>"
+                               placeholder="e.g., Name Address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Defendant_Name_Address">Defendant Name Address</label>
+                        <input type="text" id="Defendant_Name_Address" name="Defendant_Name_Address"
+                               value="<?php echo htmlspecialchars($_POST['Defendant_Name_Address'] ?? ''); ?>"
+                               placeholder="e.g., Name Address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Terminated">Terminated <span class="required">*</span></label>
+                        <input type="text" id="Terminated" name="Terminated"
+                               value="<?php echo htmlspecialchars($_POST['Terminated'] ?? ''); ?>"
+                               placeholder="e.g., Terminated">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Remarks">Remarks</label>
+                        <input type="date" id="Remarks" name="Remarks"
+                               value="<?php echo htmlspecialchars($_POST['Remarks'] ?? ''); ?>">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="Next_Date">Next Date</label>
+                        <textarea id="date" name="Next_Date" id="Next_Date"
+                                  placeholder="Enter Next Date"><?php echo htmlspecialchars($_POST['Next_Date'] ?? ''); ?></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="Last_Date">Last Date</label>
+                        <textarea id="date" name="Last_Date" id="Last_Date"
+                                  placeholder="Enter Next Date"><?php echo htmlspecialchars($_POST['Last_Date'] ?? ''); ?></textarea>
+                    </div>
+
+                      <div class="form-group">
                         <label for="judge_name">Judge Name</label>
                         <input type="text" id="judge_name" name="judge_name"
                                value="<?php echo htmlspecialchars($_POST['judge_name'] ?? ''); ?>"
                                placeholder="e.g., Hon. Judge Smith">
                     </div>
-
                     <div class="form-group">
                         <label for="case_status">Case Status <span class="required">*</span></label>
                         <select id="case_status" name="case_status" required>
@@ -427,17 +463,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="next_hearing_date">Next Hearing Date</label>
-                        <input type="date" id="next_hearing_date" name="next_hearing_date"
-                               value="<?php echo htmlspecialchars($_POST['next_hearing_date'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="case_description">Case Description</label>
-                        <textarea id="case_description" name="case_description"
-                                  placeholder="Enter detailed case description"><?php echo htmlspecialchars($_POST['case_description'] ?? ''); ?></textarea>
-                    </div>
                 </div>
 
                 <div class="form-actions">
