@@ -3,33 +3,33 @@ require_once 'config.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header(header: 'Location: index.php');
     exit();
 }
 
 // Fetch statistics
 $total_cases_query = "SELECT COUNT(*) as total FROM cases";
-$total_cases_result = $conn->query($total_cases_query);
+$total_cases_result = $conn->query(query: $total_cases_query);
 $total_cases = $total_cases_result->fetch_assoc()['total'];
 
 $active_cases_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date = 'Active'";
-$active_cases_result = $conn->query($active_cases_query);
+$active_cases_result = $conn->query(query: $active_cases_query);
 $active_cases = $active_cases_result->fetch_assoc()['total'];
 
 $settled_cases_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date = 'Settled'";
-$settled_cases_result = $conn->query($settled_cases_query);
+$settled_cases_result = $conn->query(query: $settled_cases_query);
 $settled_cases = $settled_cases_result->fetch_assoc()['total'];
 
 $under_trial_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date = 'Under Trial'";
-$under_trial_result = $conn->query($under_trial_query);
+$under_trial_result = $conn->query(query: $under_trial_query);
 $under_trial_cases = $under_trial_result->fetch_assoc()['total'];
 
 $upcoming_hearings_query = "SELECT COUNT(*) as total FROM cases WHERE Next_Date >= CURDATE()";
-$upcoming_hearings_result = $conn->query($upcoming_hearings_query);
+$upcoming_hearings_result = $conn->query(query: $upcoming_hearings_query);
 $upcoming_hearings = $upcoming_hearings_result->fetch_assoc()['total'];
 
 $case_types_query = "SELECT Types, COUNT(*) as count FROM cases GROUP BY Types ORDER BY count DESC";
-$case_types_result = $conn->query($case_types_query);
+$case_types_result = $conn->query(query: $case_types_query);
 $Types = [];
 while ($row = $case_types_result->fetch_assoc()) {
     $case_types[] = $row;
@@ -37,7 +37,7 @@ while ($row = $case_types_result->fetch_assoc()) {
 
 // Fetch all case IDs for dropdown
 $cases_query = "SELECT Case_No, Types FROM cases ORDER BY Case_No";
-$cases_result = $conn->query($cases_query);
+$cases_result = $conn->query(query: $cases_query);
 $all_cases = [];
 while ($row = $cases_result->fetch_assoc()) {
     $all_cases[] = $row;
@@ -47,8 +47,8 @@ while ($row = $cases_result->fetch_assoc()) {
 $selected_case = null;
 if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
     $Case_No = $_GET['Case_No'];
-    $stmt = $conn->prepare("SELECT * FROM cases WHERE Case_No = ?");
-    $stmt->bind_param("s", $Case_No);
+    $stmt = $conn->prepare(query: "SELECT * FROM cases WHERE Case_No = ?");
+    $stmt->bind_param(types: "s", var: $Case_No);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows === 1) {
@@ -565,7 +565,7 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
         </div>
         <div class="navbar-user">
             <div class="user-info">
-                <span>👤 <?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                <span>👤 <?php echo htmlspecialchars(string: $_SESSION['full_name']); ?></span>
             </div>
             <a href="logout.php" class="btn-logout">Logout</a>
         </div>
@@ -614,7 +614,7 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                 <div class="case-types-list">
                     <?php foreach ($Types as $type): ?>
                     <div class="case-type-item">
-                        <span class="case-type-name"><?php echo htmlspecialchars($type['Types']); ?></span>
+                        <span class="case-type-name"><?php echo htmlspecialchars(string: $type['Types']); ?></span>
                         <span class="case-type-count"><?php echo $type['count']; ?></span>
                     </div>
                     <?php endforeach; ?>
@@ -638,9 +638,9 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                         <select name="Case_No" id="Case_No" required>
                             <option value="">-- Select a Case ID --</option>
                             <?php foreach ($all_cases as $case): ?>
-                                <option value="<?php echo htmlspecialchars($case['Case_No']); ?>"
+                                <option value="<?php echo htmlspecialchars(string: $case['Case_No']); ?>"
                                     <?php echo (isset($_GET['Case_No']) && $_GET['Case_No'] === $case['Case_No']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($case['Case_No']) . ' - ' . htmlspecialchars($case['Types']); ?>
+                                    <?php echo htmlspecialchars(string: $case['Case_No']) . ' - ' . htmlspecialchars(string: $case['Types']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -655,8 +655,8 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                 <div class="case-details-header">
                     <h3>📋 Case Details</h3>
                     <div class="case-actions">
-                        <a href="edit_case.php?Case_No=<?php echo urlencode($selected_case['Case_No']); ?>" class="btn btn-edit">✏️ Edit</a>
-                        <a href="delete_case.php?Case_No=<?php echo urlencode($selected_case['Case_No']); ?>"
+                        <a href="edit_case.php?Case_No=<?php echo urlencode(string: $selected_case['Case_No']); ?>" class="btn btn-edit">✏️ Edit</a>
+                        <a href="delete_case.php?Case_No=<?php echo urlencode(string: $selected_case['Case_No']); ?>"
                            class="btn btn-delete"
                            onclick="return confirm('Are you sure you want to delete this case? This action cannot be undone.');">
                            🗑️ Delete
@@ -667,17 +667,17 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                 <div class="details-grid">
                     <div class="detail-item">
                         <div class="detail-label">Case No </div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Case_No']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['Case_No']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Case Title</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Types']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['Types']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Case Type</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['Types']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['Types']); ?></div>
                     </div>
 
                     <div class="detail-item">
@@ -686,53 +686,53 @@ if (isset($_GET['Case_No']) && !empty($_GET['Case_No'])) {
                             <?php
                             $status = $selected_case['case_status'];
                             $status_class = 'status-active';
-                            if (strpos(strtolower($status), 'settled') !== false) {
+                            if (strpos(haystack: strtolower(string: $status), needle: 'settled') !== false) {
                                 $status_class = 'status-settled';
-                            } elseif (strpos(strtolower($status), 'trial') !== false) {
+                            } elseif (strpos(haystack: strtolower(string: $status), needle: 'trial') !== false) {
                                 $status_class = 'status-trial';
                             }
                             ?>
                             <span class="status-badge <?php echo $status_class; ?>">
-                                <?php echo htmlspecialchars($status); ?>
+                                <?php echo htmlspecialchars(string: $status); ?>
                             </span>
                         </div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Plaintiff Name</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['plaintiff_name']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['plaintiff_name']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Defendant Name</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['defendant_name']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['defendant_name']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Filing Date</div>
-                        <div class="detail-value"><?php echo date('F d, Y', strtotime($selected_case['filing_date'])); ?></div>
+                        <div class="detail-value"><?php echo date(format: 'F d, Y', timestamp: strtotime(datetime: $selected_case['filing_date'])); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Court Name</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['court_name']); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['court_name']); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Judge Name</div>
-                        <div class="detail-value"><?php echo htmlspecialchars($selected_case['judge_name'] ?: 'Not Assigned'); ?></div>
+                        <div class="detail-value"><?php echo htmlspecialchars(string: $selected_case['judge_name'] ?: 'Not Assigned'); ?></div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">Next Hearing Date</div>
                         <div class="detail-value">
-                            <?php echo $selected_case['next_hearing_date'] ? date('F d, Y', strtotime($selected_case['next_hearing_date'])) : 'Not Scheduled'; ?>
+                            <?php echo $selected_case['next_hearing_date'] ? date(format: 'F d, Y', timestamp: strtotime(datetime: $selected_case['next_hearing_date'])) : 'Not Scheduled'; ?>
                         </div>
                     </div>
 
                     <div class="detail-item" style="grid-column: 1 / -1;">
                         <div class="detail-label">Case Description</div>
-                        <div class="detail-value"><?php echo nl2br(htmlspecialchars($selected_case['case_description'])); ?></div>
+                        <div class="detail-value"><?php echo nl2br(string: htmlspecialchars($selected_case['case_description'])); ?></div>
                     </div>
                 </div>
             </div>

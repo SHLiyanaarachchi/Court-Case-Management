@@ -1,12 +1,12 @@
 <?php
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '1234');
-define('DB_NAME', 'court_case_management');
+define(constant_name: 'DB_HOST', value: 'localhost');
+define(constant_name: 'DB_USER', value: 'root');
+define(constant_name: 'DB_PASS', value: '1234');
+define(constant_name: 'DB_NAME', value: 'court_case_management');
 
 // Create connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$conn = new mysqli(hostname: DB_HOST, username: DB_USER, password: DB_PASS, database: DB_NAME);
 
 // Check connection
 if ($conn->connect_error) {
@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Set charset to utf8
-$conn->set_charset("utf8");
+$conn->set_charset(charset: "utf8");
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
